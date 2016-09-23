@@ -1,0 +1,107 @@
+/*
+A monkey wants to get to the other side of a river. The monkey 
+is initially located on one bank of the river (position -1) and 
+wants to get to the opposite bank (position N). The monkey 
+can jump any (integer) distance between 1 and D. If D is less 
+than or equal to N then the monkey cannot jump right across 
+the river. Luckily, there are many stones hidden under the 
+water. The water level is constantly decreasing, and soon 
+some of the stones will be out of the water. The monkey can 
+jump to and from the stones, but only when the particular 
+stone is already out of the water.
+The stones in the river are described in array A consisting of N 
+integers. A[K] represents a time when the stone at position K 
+will be out of the water (A[K] = -1 means that there is no stone 
+at position K). You can assume that no two stones will surface 
+simultaneously. The goal is to find the earliest time when the 
+monkey can get to the other side of the river.
+
+For example, consider integer D = 3 and the following array A consisting of N = 6 integers: 
+A[0] = 1 A[1] = -1 A[2] = 0 A[3] = 2 A[4] = 3 A[5] = 5 
+Time 2 is the earliest moment when the monkey can jump across the river 
+(for example, by jumps of length 1, 3 and 3, as marked on the picture above). 
+
+
+*/
+
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+void printVec(const vector<int>& vec) {
+    for(auto& ele : vec){
+        cout << " " << ele;
+    }  
+    cout << endl;
+}
+
+int findEearliestTime(const vector<int>& vec, int step){
+    if(vec.size() == 1) {
+        return 0;
+    }
+    int begin = 0;
+    int end = 0;
+    for(const auto& m : vec){
+        end = std::max(end, m);
+    }
+
+    while(begin < end){
+        int cur = (begin + end) / 2;
+        vector<int> v(vec);
+        for(auto& ele : v){
+            if(ele != -1 && ele <= cur) {
+                ele = 0;
+            }
+        }
+        auto test = [](const vector<int>& vec, int step){
+            vector<int> suc(vec.size(), 0);
+            for(int i = 0; i < suc.size(); ++i){
+                if(vec[i] == 0 && ( i < step || suc[i-step] )) {
+                    suc[i] = 1;
+                }
+            }
+            return suc.back();
+        };
+        
+        bool suc = test(v, step);
+        if (suc) {
+            end = cur;
+        } else {
+            begin = cur + 1;
+        }
+    }
+    
+    return begin;
+    
+}
+
+int main()
+{
+    //case 1 
+    {
+        vector<int> vec = {1,-1,0,2,3,5,0};
+        int step = 3;
+        auto time = findEearliestTime(vec, step);
+        cout << "earliest time is : " << time << endl;
+        cout << "--------------------------------------" << endl << endl;
+    }
+    
+    //case 2 
+    {
+        vector<int> vec = {-1,-1,0,-1,-1,5,0};
+        int step = 3;
+        auto time = findEearliestTime(vec, step);
+        cout << "earliest time is : " << time << endl;
+        cout << "--------------------------------------" << endl << endl;
+    }
+    
+    //case 3 
+    {
+        vector<int> vec = {-1,3,-1,-1,2,-1,0};
+        int step = 3;
+        auto time = findEearliestTime(vec, step);
+        cout << "earliest time is : " << time << endl;
+        cout << "--------------------------------------" << endl << endl;
+    }
+}
