@@ -23,11 +23,62 @@ after remove node = 3, we should have following forest (represented in vector)
 
 index :  0 1  2  3 4 5 6
 parent: -1 0 -1  2 2 3 1
-
+ 
 
     0                     2
   1                     3   4
 6                    5   
 
 the optimal solution is O(N)
+
+The key observation is that we could do it just sweeping from left to right O(N) 
+keep tracking of nodes being deleted, so we could delete children nodes,
+also keep tracking of nodes being kept, but with caveat that those might have smaller index in new forest.
+
 */
+
+
+
+// Example program
+#include <iostream>
+#include <string>
+#include <vector>
+#include <unordered_set>
+#include <unordered_map>
+
+using namespace std;
+
+void removeNodeWithChildren(vector<int>& forest, int node) {
+    unordered_map<int, int> mapping;   // track index mapping between original forest -> new forest
+    unordered_set<int> dels;   // track deleted node with index in orignal forest
+    dels.insert(node);
+    
+    for(int index = node + 1 ; index < forest.size(); ++index){
+        if( dels.count(forest[index]) ) {   // if parent is deleted , we should delete child.
+            dels.insert(index);
+        }
+        else {
+            mapping[index] = index - dels.size();  // after some node deleted , we should move following node forward.
+            // for any index < node it does not change in new forest; for any index > node but not deleted, we have to consult the mapping.
+            forest[ mapping[index] ] = mapping.count( forest[index] ) ? mapping[ forest[index] ] : forest[index];    
+        }
+    }
+    
+    forest.resize(forest.size() - dels.size());
+}
+
+
+int main()
+{
+  vector<int> forest({-1, 0, -1, 0, 2, 2, 3, 3, 4, 1});
+  for (auto parent : forest) {
+    cout << parent << " ";
+  }
+  cout << endl;
+  
+  removeNodeWithChildren(forest, 3);
+  for (auto parent : forest) {
+    cout << parent << " ";
+  }
+  cout << endl;
+}
