@@ -1,0 +1,28 @@
+/*
+Randomly generate a binary tree given n #Node 
+here is a research paper:  Catalan number
+https://pdfs.semanticscholar.org/b540/419bab11afe29219ac51d88a6f9a2830b6a3.pdf
+
+struct TreeNode {
+  TreeNode* left;
+  TreeNode* right;
+} ;
+
+Treenode* generateBinaryTree(int n);
+
+Hint: 
+RootNode + Left-branch(k) + Right-branch(n-k-1)
+It tends to have different number of shapes based on k.
+
+one possible solution:
+
+1. create a distribution map S about how many shapes we have for given n 
+   ( a DP problem: S(n) = Sum(S(k) * s(n-k-1)) for every k = [0, n-1] ) : O(N^2)
+   ( We could also pre-build a running sum vector for each n as well, but aslo could generate on the fly, see step.2)
+
+2. then in the generateBinaryTree(int n) function, we build binary tree recursively, and in each step, we 
+   generate a random number between [0, S(n)] and binary search into the running sum to find the split point k, 
+   then do it recrusively for each branch.  
+   ( [ S(0)*S(n-1), S(0)*S(n-1) + S(1)*S(n-2), ......   ] )  : O(lgN) * O(lgN)
+
+*/
